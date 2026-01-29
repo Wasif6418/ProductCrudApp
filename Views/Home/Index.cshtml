@@ -1,0 +1,8 @@
+﻿@model IEnumerable<ProductCrudApp.Models.Product>
+
+<h1>Products (Home)</h1>
+
+@foreach (var product in Model)
+{
+    <p>@product.Name - @product.Price</p>
+}
