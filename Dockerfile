@@ -1,25 +1,20 @@
-# Use official .NET SDK image for build
+# Base image
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-
 WORKDIR /app
 
-# Copy csproj and restore as distinct layers
-COPY *.sln .
+# Copy csproj and restore
 COPY ProductCrudApp/*.csproj ./ProductCrudApp/
+WORKDIR /app/ProductCrudApp
 RUN dotnet restore
 
 # Copy everything else and build
 COPY ProductCrudApp/. ./ProductCrudApp/
-WORKDIR /app/ProductCrudApp
 RUN dotnet publish -c Release -o out
 
-# Build runtime image
+# Runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
-COPY --from=build /app/ProductCrudApp/out .
+COPY --from=build /app/ProductCrudApp/out ./
 
-# Expose port
-EXPOSE 5000
-
-# Start the app
+EXPOSE 7001
 ENTRYPOINT ["dotnet", "ProductCrudApp.dll"]
