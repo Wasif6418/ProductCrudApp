@@ -3,18 +3,17 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
 
 # Copy csproj and restore
-COPY ProductCrudApp/*.csproj ProductCrudApp/
-WORKDIR /app/ProductCrudApp
+COPY ProductCrudApp/*.csproj ./
 RUN dotnet restore
 
-# Copy everything else
-COPY ProductCrudApp/ ProductCrudApp/
+# Copy everything else and publish
+COPY ProductCrudApp/. ./
 RUN dotnet publish -c Release -o out
 
 # Stage 2: Runtime
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
-COPY --from=build /app/ProductCrudApp/out ./
+COPY --from=build /app/out ./
 
 EXPOSE 7001
 ENTRYPOINT ["dotnet", "ProductCrudApp.dll"]
