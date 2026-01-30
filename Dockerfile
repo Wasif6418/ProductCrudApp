@@ -1,21 +1,25 @@
-# Build stage
+# Use official .NET SDK image for build
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+
 WORKDIR /app
 
-# copy csproj
-COPY *.csproj ./
+# Copy csproj and restore as distinct layers
+COPY *.sln .
+COPY ProductCrudApp/*.csproj ./ProductCrudApp/
 RUN dotnet restore
 
-# copy everything else
-COPY . ./
+# Copy everything else and build
+COPY ProductCrudApp/. ./ProductCrudApp/
+WORKDIR /app/ProductCrudApp
 RUN dotnet publish -c Release -o out
 
-# Runtime stage
+# Build runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
-COPY --from=build /app/out .
+COPY --from=build /app/ProductCrudApp/out .
 
-ENV ASPNETCORE_URLS=http://+:8080
-EXPOSE 8080
+# Expose port
+EXPOSE 5000
 
+# Start the app
 ENTRYPOINT ["dotnet", "ProductCrudApp.dll"]

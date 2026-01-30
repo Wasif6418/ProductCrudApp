@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using ProductCrudApp.Data;
 using ProductCrudApp.Models;
+using System.Linq;
 
 namespace ProductCrudApp.Controllers
 {
@@ -28,6 +29,7 @@ namespace ProductCrudApp.Controllers
 
         // Create Product - POST
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Create(Product product)
         {
             if (ModelState.IsValid)
@@ -49,6 +51,7 @@ namespace ProductCrudApp.Controllers
 
         // Edit Product - POST
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Edit(Product product)
         {
             if (ModelState.IsValid)
@@ -70,13 +73,15 @@ namespace ProductCrudApp.Controllers
 
         // Delete Product - POST
         [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
             var product = _context.Products.Find(id);
-            if (product == null) return NotFound();
-
-            _context.Products.Remove(product);
-            _context.SaveChanges();
+            if (product != null)
+            {
+                _context.Products.Remove(product);
+                _context.SaveChanges();
+            }
             return RedirectToAction("Index");
         }
     }
